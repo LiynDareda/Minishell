@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   shell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: espinell <espinell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,48 +10,52 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "shell.h"
 
-void lexer(t_minishell *minishell)
-{
-	t_index	index;
-	index.i = 0;
-	minishell->cmdtab = ft_split(minishell->line, "|");
-	while (minishell->cmdtab[i] != NULL)
-	{
-		minishell->cmd->simplecmd[i]->args = ft_split(minishell->cmdtab[i], " ");
-		getcwd("PATH", );
-		i++;
-	}
-	
-	cat -e | grep uwu | ls
+	/*cat -e | grep uwu | ls
 	0		1			2
 	cat 
 	-e
-	right_path
+	right_path*/
+
+void lexer(t_shell *shell)
+{
+	t_index index;
+	i = 0;
+	
+	shell->cmdtab = ft_split(shell->line, "|");
+	shell->env = get_env(shell->env);
+	while (shell->cmdtab[i] != NULL)
+	{
+		shell->cmd->simplecmd->args = ft_split(shell->cmdtab, " ");
+		shell->cmd->simplecmd->path = valid_command(shell->cmd->simplecmd->args[0], shell->env);
+		if (!shell->cmd->simplecmd->path)
+			exit(0);
+		i++;
+	}
 }
 
 int main(int argc, char **argv, char **envp)
 {
-    t_minishell *minishell;
+    t_shell *shell;
 
     argc = 0;
     argv = 0;   
-	minishell = malloc(sizeof(*t_minishell));
-	if (!minishell)
+	shell = malloc(sizeof(*t_shell));
+	if (!shell)
 		return;
-	minishell->env = envp;
-	minishell->line = ft_readline("minishell$ ");
-    while (minishell.line > 0)
+	shell->env = envp;
+	shell->line = ft_readline("minishell$ ");
+    while (shell->line > 0)
     {
-		if(is_valid_line(minishell->line)) 
+		if(is_valid_line(shell->line)) 
 		{
-			add_history(minishell->line);
-			lexer(minishell);
-			parser(minishell);
-			executor(minishell);
+			add_history(shell->line);
+			lexer(shell);
+			parser(shell);
+			executor(shell);
 		}
-        minishell.line = ft_readline("minishell$ ");
+        shell.line = ft_readline("minishell$ ");
     }
     return (0);
 }

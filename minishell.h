@@ -28,14 +28,14 @@ typedef struct s_cmd
 	char			io[2][255];
 }			t_cmd;
 
-typedef struct minishell
+typedef struct shell
 {
 	t_cmd	*cmd;
 	char	*line;
 	char	**env;
 	char 	*token;
 	char	**cmdtab;	
-}			t_minishell;
+}			t_shell;
 
 typedef struct index
 {
