@@ -6,7 +6,7 @@
 /*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 12:02:56 by espinell          #+#    #+#             */
-/*   Updated: 2024/04/24 12:03:23 by lbarlett         ###   ########.fr       */
+/*   Updated: 2024/04/24 14:29:10 by lbarlett         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ char	*valid_command(char **command, char **env)
 	return (NULL);
 }
 
-char	**get_env(char **envp)
+char	**get_path(char **envp)
 {
 	int		i;
 	char	**mat;

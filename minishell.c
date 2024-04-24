@@ -18,41 +18,57 @@
 	-e
 	right_path*/
 
-void	lexer(t_shell *shell)
+void	lexer(t_shell *shell, char **envp)
 {
 	t_index	index;
 
 	index.i = 0;
 	shell->cmdtab = ft_split(shell->line, '|');
-	shell->env = get_env(shell->env);
-	while (shell->cmdtab[index.i] != NULL)
+	shell->env = get_path(envp);
+	while (shell->cmdtab[index.i])
 	{
 		shell->cmd->simplecmd->args = ft_split(shell->cmdtab[index.i], ' ');
-		shell->cmd->simplecmd->path = valid_command(&shell->cmd->simplecmd->args[0], shell->env);
+		shell->cmd->simplecmd->path
+			= valid_command(shell->cmd->simplecmd->args, shell->env);
 		if (!shell->cmd->simplecmd->path)
-			ft_exit(0);
-		printf("OK!\n");
+		{
+			write(2, "Command not found\n", 18);
+			free_mat(shell->cmd->simplecmd->args);
+			free_mat(shell->cmdtab);
+			return ;
+		}
 		index.i++;
 	}
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_shell	*shell;
+	t_shell		*shell;
+	t_cmd		*cmd;
+	t_simplecmd	*simplecmd;
 
 	argc += 0;
 	argv += 0;
+	if (argc > 1)
+		exit(0);
 	shell = malloc(sizeof(t_shell));
 	if (!shell)
-		return (0);
-	shell->env = envp;
+		ft_exit(0);
+	cmd = malloc(sizeof(t_cmd));
+	if (!cmd)
+		ft_exit(0);
+	simplecmd = malloc(sizeof(t_simplecmd));
+	if (!simplecmd)
+		ft_exit(0);
+	shell->cmd = cmd;
+	shell->cmd->simplecmd = simplecmd;
 	shell->line = ft_readline("minishell$ ");
 	while (shell->line > 0)
 	{
 		if (is_valid_line(shell->line)) 
 		{
 			add_history(shell->line);
-			lexer(shell);
+			lexer(shell, envp);
 		}
 		shell->line = ft_readline("minishell$ ");
 	}
