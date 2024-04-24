@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: espinell <espinell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 12:02:56 by espinell          #+#    #+#             */
-/*   Updated: 2024/04/18 12:09:31 by espinell         ###   ########.fr       */
+/*   Updated: 2024/04/24 12:03:23 by lbarlett         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,8 @@ char *ft_readline(char *str)
     if (!line)
 	{
 		printf("exit\n");
-		garbage_collector();
-		exit(0);
+		//garbage_collector();
+		ft_exit(0);
 	}
     return (line);
 }

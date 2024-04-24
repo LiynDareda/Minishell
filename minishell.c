@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell.h"
+#include "minishell.h"
 
 	/*cat -e | grep uwu | ls
 	0		1			2
@@ -18,44 +18,43 @@
 	-e
 	right_path*/
 
-void lexer(t_shell *shell)
+void	lexer(t_shell *shell)
 {
-	t_index index;
-	i = 0;
-	
-	shell->cmdtab = ft_split(shell->line, "|");
+	t_index	index;
+
+	index.i = 0;
+	shell->cmdtab = ft_split(shell->line, '|');
 	shell->env = get_env(shell->env);
-	while (shell->cmdtab[i] != NULL)
+	while (shell->cmdtab[index.i] != NULL)
 	{
-		shell->cmd->simplecmd->args = ft_split(shell->cmdtab, " ");
-		shell->cmd->simplecmd->path = valid_command(shell->cmd->simplecmd->args[0], shell->env);
+		shell->cmd->simplecmd->args = ft_split(shell->cmdtab[index.i], ' ');
+		shell->cmd->simplecmd->path = valid_command(&shell->cmd->simplecmd->args[0], shell->env);
 		if (!shell->cmd->simplecmd->path)
-			exit(0);
-		i++;
+			ft_exit(0);
+		printf("OK!\n");
+		index.i++;
 	}
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-    t_shell *shell;
+	t_shell	*shell;
 
-    argc = 0;
-    argv = 0;   
-	shell = malloc(sizeof(*t_shell));
+	argc += 0;
+	argv += 0;
+	shell = malloc(sizeof(t_shell));
 	if (!shell)
-		return;
+		return (0);
 	shell->env = envp;
 	shell->line = ft_readline("minishell$ ");
-    while (shell->line > 0)
-    {
-		if(is_valid_line(shell->line)) 
+	while (shell->line > 0)
+	{
+		if (is_valid_line(shell->line)) 
 		{
 			add_history(shell->line);
 			lexer(shell);
-			parser(shell);
-			executor(shell);
 		}
-        shell.line = ft_readline("minishell$ ");
-    }
-    return (0);
+		shell->line = ft_readline("minishell$ ");
+	}
+	return (0);
 }
