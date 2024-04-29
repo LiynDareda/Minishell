@@ -6,7 +6,7 @@
 /*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 11:13:35 by espinell          #+#    #+#             */
-/*   Updated: 2024/04/29 12:04:12 by lbarlett         ###   ########.fr       */
+/*   Updated: 2024/04/29 14:23:15 by lbarlett         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,13 @@ typedef struct s_garbage
 typedef struct s_simplecmd
 {
 	char	*path;
+	char	*path;
 	char	**args;
 }			t_simplecmd;
 
 typedef struct s_cmd
 {
+	t_simplecmd		*simplecmd;
 	t_simplecmd		*simplecmd;
 	char			io[2][255];
 }			t_cmd;

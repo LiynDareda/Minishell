@@ -13,7 +13,14 @@
 #include "minishell.h"
 
 void	lexer(t_shell *shell, char **envp)
+void	lexer(t_shell *shell, char **envp)
 {
+	t_index	index;
+
+	index.i = 0;
+	shell->cmdtab = ft_split(shell->line, '|');
+	shell->env = get_path(envp);
+	while (shell->cmdtab[index.i])
 	t_index	index;
 
 	index.i = 0;
@@ -24,7 +31,17 @@ void	lexer(t_shell *shell, char **envp)
 		shell->cmd->simplecmd->args = ft_split(shell->cmdtab[index.i], ' ');
 		shell->cmd->simplecmd->path
 			= valid_command(shell->cmd->simplecmd->args, shell->env);
+		shell->cmd->simplecmd->args = ft_split(shell->cmdtab[index.i], ' ');
+		shell->cmd->simplecmd->path
+			= valid_command(shell->cmd->simplecmd->args, shell->env);
 		if (!shell->cmd->simplecmd->path)
+		{
+			write(2, "Command not found\n", 18);
+			free_mat(shell->cmd->simplecmd->args);
+			free_mat(shell->cmdtab);
+			return ;
+		}
+		index.i++;
 		{
 			write(2, "Command not found\n", 18);
 			free_mat(shell->cmd->simplecmd->args);
@@ -75,8 +92,10 @@ int	main(int argc, char **argv, char **envp)
 		{
 			add_history(shell->line);
 			lexer(shell, envp);
+			lexer(shell, envp);
 		}
 		shell->line = ft_readline("minishell$ ", garbage, shell);
 	}
 	return (0);
 }
+
