@@ -1,4 +1,4 @@
-SRCS = minishell.c minishell_utils.c error.c split_utils.c
+SRCS = minishell.c minishell_utils.c error.c split_utils.c executor.c garbage_collector.c
 
 NAME = minishell
 

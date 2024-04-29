@@ -6,7 +6,7 @@
 /*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 12:02:56 by espinell          #+#    #+#             */
-/*   Updated: 2024/04/24 12:03:23 by lbarlett         ###   ########.fr       */
+/*   Updated: 2024/04/29 14:10:44 by lbarlett         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@ char	*valid_command(char **command, char **env)
 	command2 = ft_strjoin("/", command[0]);
 	while (env[i])
 	{
-		tmp = ft_strjoin(env[i], command2);
+		if (ft_strnstr(command2, "//bin", 5))
+			tmp = ft_strjoin(env[i], command2 + 5);
+		else
+			tmp = ft_strjoin(env[i], command2);
 		if (access(tmp, F_OK) == 0)
 		{
 			free(command2);
@@ -35,7 +38,7 @@ char	*valid_command(char **command, char **env)
 	return (NULL);
 }
 
-char	**get_env(char **envp)
+char	**get_path(char **envp)
 {
 	int		i;
 	char	**mat;
@@ -53,44 +56,22 @@ char	**get_env(char **envp)
 	return (NULL);
 }
 
-char	*my_get_env(char ***env, char ***cmd, char **envp,
-					char *argv)
-{
-	char	*tmp;
-
-	*env = get_env(envp);
-	if (*env == NULL)
-		ft_error (5);
-	*cmd = ft_split(argv, ' ');
-	if (*cmd == NULL)
-	{
-		free_mat(*env);
-		ft_error(6);
-	}
-	tmp = valid_command(*cmd, *env);
-	if (tmp == NULL)
-	{
-		(void)(free_mat(*env) + free_mat(*cmd));
-		ft_error (7);
-	}
-	return (tmp);
-}
-
-char *ft_readline(char *str)
+char	*ft_readline(char *str, t_garbage *garbage, t_shell *shell)
 {
     char *line;
 
     line = readline(str);
+	ft_lstadd_back(&garbage, ft_lstnew(line));
     if (!line)
 	{
 		printf("exit\n");
-		//garbage_collector();
+		garbage_collector(&garbage, shell);
 		ft_exit(0);
 	}
     return (line);
 }
 
-int is_valid_line(char *line)
+int	is_valid_line(char *line)
 {
     int i;
 
