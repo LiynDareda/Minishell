@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/18 12:02:56 by espinell          #+#    #+#             */
-/*   Updated: 2024/04/29 14:22:31 by lbarlett         ###   ########.fr       */
+/*   Updated: 2024/05/06 13:30:57 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ char	*valid_command(char **command, char **env)
 	return (NULL);
 }
 
-char	**get_path(char **envp)
+char	**get_env(char **envp)
 {
 	int		i;
 	char	**mat;
@@ -58,29 +58,39 @@ char	**get_path(char **envp)
 
 char	*ft_readline(char *str, t_garbage *garbage, t_shell *shell)
 {
-    char *line;
+	char	*line;
 
-    line = readline(str);
+	line = readline(str);
 	ft_lstadd_back(&garbage, ft_lstnew(line));
-    if (!line)
+	if (!line)
 	{
 		printf("exit\n");
 		garbage_collector(&garbage, shell);
 		ft_exit(0);
 	}
-    return (line);
+	return (line);
 }
 
 int	is_valid_line(char *line)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (line[i])
-    {
-        if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n')
-            return (1);
-        i++;
-    }
-    return (0);
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+char	**check_cmdtab(char **shell)
+{
+	int		i;
+	char	**cmdtab;
+
+	i = 0;
+	cmdtab = ft_split(shell, ';');
+	return (cmdtab);
 }

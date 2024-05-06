@@ -13,27 +13,41 @@
 #include "minishell.h"
 
 void	lexer(t_shell *shell, char **envp)
-void	lexer(t_shell *shell, char **envp)
 {
 	t_index	index;
 
 	index.i = 0;
 	shell->cmdtab = ft_split(shell->line, '|');
-	shell->env = get_path(envp);
-	while (shell->cmdtab[index.i])
-	t_index	index;
-
-	index.i = 0;
-	shell->cmdtab = ft_split(shell->line, '|');
-	shell->env = get_path(envp);
+	shell->env = get_env(envp);
+	//check_cmdtab(shell->cmdtab);
 	while (shell->cmdtab[index.i])
 	{
 		shell->cmd->simplecmd->args = ft_split(shell->cmdtab[index.i], ' ');
 		shell->cmd->simplecmd->path
 			= valid_command(shell->cmd->simplecmd->args, shell->env);
-		shell->cmd->simplecmd->args = ft_split(shell->cmdtab[index.i], ' ');
-		shell->cmd->simplecmd->path
-			= valid_command(shell->cmd->simplecmd->args, shell->env);
+		if (ft_strncmp(shell->cmdtab[0], "export", 6) == 0)
+		{
+			if (ft_strchr(shell->cmd->simplecmd->args[1], '=') == 0)
+			{
+				export(shell->cmd->simplecmd->args[1], envp);
+				return ;
+			}
+			else
+			{
+				printf("non valido\n");
+				return ;
+			}
+		}
+		if (ft_strncmp(shell->cmdtab[0], "env", 3) == 0)
+		{
+			print_env(envp);
+			return ;
+		}
+		if (ft_strncmp(shell->cmdtab[0], "pwd", 3) == 0)
+		{
+			pwd(envp);
+			return ;
+		}
 		if (!shell->cmd->simplecmd->path)
 		{
 			write(2, "Command not found\n", 18);
@@ -42,16 +56,8 @@ void	lexer(t_shell *shell, char **envp)
 			return ;
 		}
 		index.i++;
-		{
-			write(2, "Command not found\n", 18);
-			free_mat(shell->cmd->simplecmd->args);
-			free_mat(shell->cmdtab);
-			return ;
-		}
-		index.i++;
 	}
-
-	execute(shell, envp);
+	executor(shell, envp, index.i);
 }
 
 t_shell	*init_shell(void)
@@ -69,8 +75,6 @@ t_shell	*init_shell(void)
 		ft_exit(0);
 	return (shell);
 }
-
-
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -92,10 +96,8 @@ int	main(int argc, char **argv, char **envp)
 		{
 			add_history(shell->line);
 			lexer(shell, envp);
-			lexer(shell, envp);
 		}
 		shell->line = ft_readline("minishell$ ", garbage, shell);
 	}
 	return (0);
 }
-
