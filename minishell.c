@@ -82,6 +82,7 @@ int	main(int argc, char **argv, char **envp)
 	t_cmd		*cmd;
 	t_simplecmd	*simplecmd;
 	t_garbage	*garbage;
+	static int	signal;
 
 	argc += 0;
 	argv += 0;

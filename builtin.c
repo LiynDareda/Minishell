@@ -9,7 +9,14 @@ void    export(char *args, char **envp)
     id.j = 0;
     id.k = 0;
     while (envp[id.i])
+    {
+        if (ft_strncmp(envp[id.i], args, ft_idchar(args, '=')) == 0)
+        {
+            ft_var_update(args, envp[id.i]);
+            return ;
+        }
         id.i++;
+    }
     envp[id.i] = (char *)malloc(sizeof(char) * (ft_strlen(args) + 1));
     while (args[id.j])
     {
@@ -34,6 +41,11 @@ void    print_env(char **envp)
     }
 }
 
+void    ft_exit(t_shell *shell, t_garbage **garbage, int signal)
+{
+    garbage_collector(garbage, shell);
+    exit(signal);
+}
 
 void    pwd(char **envp)
 {
