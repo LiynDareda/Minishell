@@ -28,11 +28,11 @@ void    export(char *args, char **envp)
 		}
 		return ;
 	}
-    if ((args[0] >= 'a' && args[0] <= 'z') || (args[0] >= 'A' && args[0] <= 'Z'))
+    if ((args[0] >= 'a' && args[0] <= 'z') || (args[0] >= 'A' && args[0] <= 'Z') || args[0] == '$')
     {
         while (envp[id.i])
         {
-            if (ft_strncmp(envp[id.i], args, ft_name(args)) == 0)
+            if (ft_strncmp_export(envp[id.i], args, ft_name(args)) == 0)
             {
                 ft_var_update(args, envp[id.i]);
                 return ;
@@ -51,7 +51,7 @@ void    export(char *args, char **envp)
         envp[id.i] = NULL;
     }
     else
-        printf ("export: `%s': not a valid identifier\n", args);
+        printf("export: `%s': not a valid identifier\n", args);
 }
 
 void    print_env(char **envp)
