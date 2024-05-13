@@ -67,7 +67,7 @@ $(NAME): $(OBJS)
 	ranlib $(NAME)
 
 %.o: %.c
-	cc -c -Wall -Wextra -Werror $?
+	cc -c -g -Wall -Wextra -Werror $?
 
 bonus: $(OBJS) $(BOBJS)
 	ar r $(NAME) $?

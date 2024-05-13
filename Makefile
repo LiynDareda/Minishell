@@ -10,14 +10,14 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = minishell.c minishell_utils.c error.c split_utils.c executor.c garbage_collector.c echo.c builtin.c
+SRCS = minishell.c minishell_utils.c error.c utils.c executor.c garbage_collector.c echo.c builtin.c export_utils.c
 
 NAME = minishell
 
-COMPILE = cc -Wall -Wextra -Werror -g
+COMPILE = cc -g -Wall -Wextra -Werror
 
-LIBFT_DIR = libft/
-LIBFT = libft/libft.a
+LIBFT_DIR = Libft/
+LIBFT = Libft/libft.a
 
 OBJS = $(SRCS:.c=.o)
 

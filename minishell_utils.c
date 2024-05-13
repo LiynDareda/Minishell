@@ -85,7 +85,7 @@ int	is_valid_line(char *line)
 	return (0);
 }
 
-char	**check_cmdtab(char **shell)
+char	**check_cmdtab(char *shell)
 {
 	int		i;
 	char	**cmdtab;

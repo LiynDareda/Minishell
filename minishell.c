@@ -1,14 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   shell.c                                        :+:      :+:    :+:   */
+/*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: espinell <espinell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/18 11:08:31 by espinell          #+#    #+#             */
-/*   Updated: 2024/04/18 13:37:49 by espinell         ###   ########.fr       */
+/*   Created: 2024/05/09 12:15:14 by espinell          #+#    #+#             */
+/*   Updated: 2024/05/09 12:15:14 by espinell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "minishell.h"
 
@@ -17,26 +19,20 @@ void	lexer(t_shell *shell, char **envp)
 	t_index	index;
 
 	index.i = 0;
+	index.j = 0;
 	shell->cmdtab = ft_split(shell->line, '|');
-	shell->env = get_env(envp);
+	shell->path = get_env(envp);
 	//check_cmdtab(shell->cmdtab);
 	while (shell->cmdtab[index.i])
 	{
 		shell->cmd->simplecmd->args = ft_split(shell->cmdtab[index.i], ' ');
 		shell->cmd->simplecmd->path
-			= valid_command(shell->cmd->simplecmd->args, shell->env);
+			= valid_command(shell->cmd->simplecmd->args, shell->path);
 		if (ft_strncmp(shell->cmdtab[0], "export", 6) == 0)
 		{
-			if (ft_strchr(shell->cmd->simplecmd->args[1], '=') == 0)
-			{
-				export(shell->cmd->simplecmd->args[1], envp);
-				return ;
-			}
-			else
-			{
-				printf("non valido\n");
-				return ;
-			}
+			while (shell->cmd->simplecmd->args[++index.j])
+				export(shell->cmd->simplecmd->args[index.j], envp);
+			return ;
 		}
 		if (ft_strncmp(shell->cmdtab[0], "env", 3) == 0)
 		{
@@ -48,6 +44,14 @@ void	lexer(t_shell *shell, char **envp)
 			pwd(envp);
 			return ;
 		}
+		if (ft_strncmp(shell->cmdtab[0], "unset", 5) == 0)
+		{
+			while (shell->cmd->simplecmd->args[++index.j])
+				unset(shell->cmd->simplecmd->args[index.j], envp);
+			return ;
+		}
+		if (ft_strncmp(shell->cmdtab[0], "exit", 4) == 0)
+			ft_quit(shell, shell->garbage, 1);
 		if (!shell->cmd->simplecmd->path)
 		{
 			write(2, "Command not found\n", 18);
@@ -89,16 +93,17 @@ int	main(int argc, char **argv, char **envp)
 	if (argc > 1)
 		exit(0);
 	shell = init_shell();
+	shell->env = env_copy(envp);
 	garbage = (t_garbage *)malloc(sizeof(t_garbage));
-	shell->line = ft_readline("minishell$ ", garbage, shell);
+	shell->line = ft_readline(ORANGE "minishell$ " DEFAULT, garbage, shell);
 	while (shell->line > 0)
 	{
 		if (is_valid_line(shell->line))
 		{
 			add_history(shell->line);
-			lexer(shell, envp);
+			lexer(shell, shell->env);
 		}
-		shell->line = ft_readline("minishell$ ", garbage, shell);
+		shell->line = ft_readline(ORANGE "minishell$ " DEFAULT, garbage, shell);
 	}
 	return (0);
 }

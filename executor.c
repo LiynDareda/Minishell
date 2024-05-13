@@ -72,7 +72,6 @@ void	executor(t_shell *shell, char **envp, int i)
 	p.k = 0;
 	if (ft_strncmp(shell->cmdtab[0], "echo", 4) == 0)
 	{
-		shell->env = envp;
 		ft_echo(shell->cmdtab[0], shell);
 		return ;
 	}
