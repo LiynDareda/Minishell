@@ -5,95 +5,83 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: espinell <espinell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/09 12:15:44 by espinell          #+#    #+#             */
-/*   Updated: 2024/05/09 12:15:44 by espinell         ###   ########.fr       */
+/*   Created: 2024/05/15 11:28:22 by mdella-r          #+#    #+#             */
+/*   Updated: 2024/05/27 12:46:00 by espinell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void    export(char *args, char **envp)
+int	export(char *str, char **envp)
 {
-    t_index id;
+	t_index	id;
 
-    id.i = 0;
-    id.j = 0;
-    id.k = 0;
-	if (args == NULL)
+	id.i = -1;
+	id.j = -1;
+	if (str == NULL)
 	{
-		while (envp[id.i])
-		{
+		while (envp[++id.i])
 			printf("declare -x %s\n", envp[id.i]);
-			id.i++;
-		}
-		return ;
+		return (0);
 	}
-    if ((args[0] >= 'a' && args[0] <= 'z') || (args[0] >= 'A' && args[0] <= 'Z') || args[0] == '$')
-    {
-        while (envp[id.i])
-        {
-            if (ft_strncmp_export(envp[id.i], args, ft_name(args)) == 0)
-            {
-                ft_var_update(args, envp[id.i]);
-                return ;
-            }
-            id.i++;
-        }
-        envp[id.i] = (char *)malloc(sizeof(char) * (ft_strlen(args) + 1));
-        while (args[id.j])
-        {
-            envp[id.i][id.j] = args[id.k];
-            id.j++;
-            id.k++;
-        }
-        envp[id.i][id.j] = '\0';
-        id.i++;
-        envp[id.i] = NULL;
-    }
-    else
-        printf("export: `%s': not a valid identifier\n", args);
+	if ((str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z'))
+	{
+		while (envp[++id.i])
+			if (ft_strncmp(envp[id.i], str, ft_name(str)) == 0)
+				return (ft_var_update(str, envp[id.i]));
+		envp[id.i] = (char *)malloc(sizeof(char) * (ft_strlen(str) + 1));
+		add_env(str, envp, id.i, &id.j);
+		envp[id.i][id.j] = '\0';
+		envp[++id.i] = NULL;
+	}
+	else
+		printf ("export: `%s': not a valid identifier\n", str);
+	return (0);
 }
 
-void    print_env(char **envp)
+int	print_env(char **envp, int fd)
 {
-    t_index id;
+	t_index	id;
 
-    id.i = 0;
-    while (envp[id.i])
-    {
+	id.i = -1;
+	id.j = -1;
+	while (envp[++id.i])
+	{
 		if (ft_strchr(envp[id.i], '=') == 0)
-        	printf("%s\n", envp[id.i]);
-        id.i++;
-    }
+		{
+			ft_putstr(envp[id.i]);	
+			ft_putchar_fd('\n', fd);
+		}
+	}
+	return (0);
 }
 
-void    ft_quit(t_shell *shell, t_garbage **garbage, int signal)
-{
-    garbage_collector(garbage, shell);
-    exit(signal);
-}
 
-void    pwd(char **envp)
+int	pwd(char **envp, int fd)
 {
-    int i;
-
-    i = 0;
-    while(envp[i])
-    {
-        if (ft_strncmp(envp[i], "PWD", 3) == 0)
-            printf("%s\n", envp[i] + 4);
-        i++;
-    }
-}
-
-void	unset(char *args, char **envp)
-{
-	int i;
+	int	i;
 
 	i = 0;
-	while(envp[i])
+	while (envp[i])
 	{
-		if(ft_strncmp(envp[i], args, ft_strlen(args)) == 0)
+		if (ft_strncmp(envp[i], "PWD", 3) == 0)
+		{
+			ft_putstr(envp[i] + 4);
+			ft_putchar_fd('\n', fd);
+		}
+		i++;
+	}
+	return (0);
+}
+
+int	unset(char *args, char **envp)
+{
+	int	i;
+
+	i = 0;
+	while (envp[i])
+	{
+		if (ft_strncmp(envp[i], args, ft_strlen(args)) == 0)
 		{
 			free(envp[i]);
 			break ;
@@ -105,5 +93,5 @@ void	unset(char *args, char **envp)
 		envp[i] = envp[i + 1];
 		i++;
 	}
+	return (0);
 }
-

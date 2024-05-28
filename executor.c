@@ -3,115 +3,129 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
+/*   By: espinell <espinell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/29 11:05:00 by lbarlett          #+#    #+#             */
-/*   Updated: 2024/05/02 14:57:30 by lbarlett         ###   ########.fr       */
+/*   Created: 2024/05/15 11:36:03 by mdella-r          #+#    #+#             */
+/*   Updated: 2024/05/27 14:49:03 by espinell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+static void	execute_one_command(t_shell *shell, char **envp)
+{
+	int		filefd;
+	char	**env;
+
+	signal(SIGQUIT, ctrl_bslash);
+	if (shell->cmd->io[0] != NULL)
+	{
+		filefd = open(shell->cmd->io[0], O_RDONLY);
+		dup2(filefd, 0);
+	}
+	shell->cmd->scmd->args = ft_split(shell->cmdtab[0], ' ');
+	env = get_env(envp);
+	if (check_builtin2(shell, envp, 0, 1) == 0)
+		ft_quit(shell, 13, 0);
+	shell->cmd->scmd->path = valid_command(shell->cmd->scmd->args, env);
+	execve(shell->cmd->scmd->path, shell->cmd->scmd->args, envp);
+	ft_quit(shell, 14, 0);
+}
+
 static void	execute_command(t_shell *shell, int i, int **fd, char **envp)
 {
-	int	filefd;
-	char **env;
+	int		filefd;
+	char	**env;
 
-	shell->cmd->simplecmd->args = ft_split(shell->cmdtab[i], ' ');
-	env = get_env(envp);
-	shell->cmd->simplecmd->path
-		= valid_command(shell->cmd->simplecmd->args, env);
+	signal(SIGQUIT, ctrl_bslash);
 	if (i == 0)
 	{
 		(void)(dup2(fd[i][1], 1) + close(fd[i][0]));
-		// if (infile esiste)
-		// {
-		// 	filefd = open(shell->cmd->io[0], O_RDONLY);
-		// 	dup2(filefd, 0);
-		// }
+		if (shell->cmd->io[0] != NULL)
+		{
+			filefd = open(shell->cmd->io[0], O_RDONLY);
+			dup2(filefd, 0);
+		}
 	}
 	else
 	{
 		(void)(dup2(fd[i][1], 1) + close(fd[i][0]) +
 			dup2(fd[i - 1][0], 0) + close(fd[i - 1][1]));
 	}
-	execve(shell->cmd->simplecmd->path,
-		shell->cmd->simplecmd->args, envp);
-		exit (0);
+	shell->cmd->scmd->args = ft_split(shell->cmdtab[i], ' ');
+	env = get_env(envp);
+	if (check_builtin2(shell, envp, 0, fd[i][1]) == 0)
+		ft_quit(shell, 11, 0);
+	shell->cmd->scmd->path = valid_command(shell->cmd->scmd->args, env);
+	execve(shell->cmd->scmd->path, shell->cmd->scmd->args, envp);
+	ft_quit(shell, 12, 0);
 }
 
 static void	execute_last_command(t_shell *shell, int i, int **fd, char **envp)
 {
-	int	filefd;
-	char **env;
+	int		filefd;
+	char	**env;
 
-	shell->cmd->simplecmd->args = ft_split(shell->cmdtab[i], ' ');
-	env = get_env(envp);
-	shell->cmd->simplecmd->path
-		= valid_command(shell->cmd->simplecmd->args, env);
+	signal(SIGQUIT, ctrl_bslash);
+	filefd = 1;
+	if (shell->cmd->io[1] != NULL)
+	{
+		filefd = open(shell->cmd->io[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		dup2(filefd, 1);
+	}
 	dup2(fd[i - 1][0], 0);
 	close(fd[i - 1][1]);
-	// if (outfile esiste)
-	// {
-	// 	filefd = open(shell->cmd->io[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	// 	dup2(filefd, 1);
-	// }
-	execve(shell->cmd->simplecmd->path,
-		shell->cmd->simplecmd->args, envp);
-		exit (0);
+	shell->cmd->scmd->args = ft_split(shell->cmdtab[i], ' ');
+	env = get_env(envp);
+	if (!check_builtin2(shell, envp, 0, filefd))
+		ft_quit(shell, 9, 0);
+	shell->cmd->scmd->path = valid_command(shell->cmd->scmd->args, env);
+	execve(shell->cmd->scmd->path, shell->cmd->scmd->args, envp);
+	ft_quit(shell, 10, 0);
+}
+
+static void	pipex(t_shell *shell, char **envp, int i)
+{
+	t_index	p;
+
+	p.i = -1;
+	p.j = -1;
+	p.fd = malloc(sizeof(int *) * (i - 1));
+	while (++p.j < i - 1)
+		p.fd[p.j] = malloc(sizeof(int) * 2);
+	while (++p.i < i - 1)
+	{
+		if (pipe(p.fd[p.i]) == -1)
+			ft_error(shell, 6, 0);
+		p.pid = fork();
+		if (p.pid == -1)
+			ft_error(shell, 7, 0);
+		if (p.pid == 0)
+			execute_command(shell, p.i, p.fd, envp);
+		else if (p.i < i - 1)
+			close(p.fd[p.i][1]);
+	}
+	p.pid = fork();
+	if (p.pid == -1)
+		ft_error(shell, 8, 0);
+	if (p.pid == 0)
+		execute_last_command(shell, p.i, p.fd, envp);
+	wait_and_free(p.pid, p.fd, p.i);
 }
 
 void	executor(t_shell *shell, char **envp, int i)
 {
 	t_index	p;
-	pid_t	pid;
-	int		**fd;
 
-	p.i = -1;
-	p.j = -1;
-	p.k = 0;
-	if (ft_strncmp(shell->cmdtab[0], "echo", 4) == 0)
-	{
-		ft_echo(shell->cmdtab[0], shell);
-		return ;
-	}
 	if (i == 1)
 	{
-		pid = fork();
-		if (pid == 0)
-		{
-			execve(shell->cmd->simplecmd->path,
-				shell->cmd->simplecmd->args, envp);
-			exit (0);
-		}
+		p.pid = fork();
+		if (p.pid == 0)
+			execute_one_command(shell, envp);
 		else
-		{
-			waitpid(pid, NULL, 0);
-			return ;
-		}
+			waitpid(p.pid, NULL, 0);
 		return ;
 	}
 	else
-		fd = malloc(sizeof(int *) * (i - 1));
-	while (++p.j < i - 1)
-		fd[p.j] = malloc(sizeof(int) * 2);
-	while (++p.i < i - 1)
-	{
-		if (pipe(fd[p.i]) == -1)
-			ft_error(1);
-		pid = fork();
-		if (pid == -1)
-			ft_error(2);
-		if (pid == 0)
-			execute_command(shell, p.i, fd, envp);
-		else if (p.i < i - 1)
-			close(fd[p.i][1]);
-	}
-	pid = fork();
-	if (pid == -1)
-		ft_error(2);
-	if (pid == 0)
-		execute_last_command(shell, p.i, fd, envp);
-	else
-		waitpid(pid, NULL, 0);
+		pipex(shell, envp, i);
 }

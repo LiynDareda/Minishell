@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   split_utils.c                                      :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mdella-r <mdella-r@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/24 12:01:22 by lbarlett          #+#    #+#             */
-/*   Updated: 2024/04/24 12:02:03 by lbarlett         ###   ########.fr       */
+/*   Created: 2024/05/15 11:35:11 by mdella-r          #+#    #+#             */
+/*   Updated: 2024/05/15 12:36:15 by mdella-r         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ char	**env_copy(char **envp)
 	i = 0;
 	j = 0;
 	env_copy = (char **)malloc(sizeof(char *) * (matlen(envp) + 1));
-	while(envp[i])
+	while (envp[i])
 	{
 		j = 0;
 		env_copy[i] = (char *)malloc(sizeof(char) * (ft_strlen(envp[i]) + 1));
@@ -69,34 +69,4 @@ size_t	ft_name(char *str)
 	while (str[i] && str[i] != '=')
 		i++;
 	return (i);
-}
-
-int	check_last_dq(char *args)
-{
-	int	i;
-	int dq;
-
-	i = 0;
-	while (args[i])
-	{
-		if(args[i] == '"')
-			dq++;
-		i++;
-	}
-	return (dq);
-}
-
-int	check_last_sq(char *args)
-{
-	int	i;
-	int sq;
-
-	i = 0;
-	while (args[i])
-	{
-		if(args[i] == 34)
-			sq++;
-		i++;
-	}
-	return (sq);
 }

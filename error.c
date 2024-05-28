@@ -12,9 +12,10 @@
 
 #include "minishell.h"
 
-void	ft_error(int id)
+void	ft_error(t_shell *shell, int id, int flag)
 {
 	perror("Error");
+	garbage_collector(shell, flag);
 	exit(id);
 }
 
@@ -22,4 +23,10 @@ void	ft_exit(int id)
 {
 	write(2, "Error\n", 6);
 	exit (id);
+}
+
+void	ft_quit(t_shell *shell, int signal, int flag)
+{
+	garbage_collector(shell, flag);
+	exit(signal);
 }

@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/29 11:25:53 by lbarlett          #+#    #+#             */
-/*   Updated: 2024/04/29 14:18:40 by lbarlett         ###   ########.fr       */
+/*   Created: 2024/05/15 11:38:02 by mdella-r          #+#    #+#             */
+/*   Updated: 2024/05/20 13:44:34 by lbarlett         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,22 +18,19 @@ void	free_shell(t_shell *shell)
 
 	index.i = 0;
 	index.j = 0;
-	if (shell->env)
-		free(shell->env);
 	if (shell->cmdtab)
 		free_mat(shell->cmdtab);
-	if (shell->cmd->simplecmd->path)
-		free(shell->cmd->simplecmd->path);
-	if (shell->cmd->simplecmd->args)
-		free_mat(shell->cmd->simplecmd->args);
-	if (shell->cmd->simplecmd)
-		free(shell->cmd->simplecmd);
+	if (shell->cmd->scmd->path)
+		free(shell->cmd->scmd->path);
+	if (shell->cmd->scmd->args)
+		free_mat(shell->cmd->scmd->args);
+	if (shell->cmd->scmd)
+		free(shell->cmd->scmd);
 	if (shell->cmd->io[0])
 		free(shell->cmd->io[0]);
 	if (shell->cmd->io[1])
 		free(shell->cmd->io[1]);
 }
-
 
 t_garbage	*ft_lstnew(void *line)
 {
@@ -80,8 +77,13 @@ void	ft_lstclear(t_garbage **lst, void (*del)(void*))
 	*lst = NULL;
 }
 
-void	garbage_collector(t_garbage **garbage, t_shell *shell)
+void	garbage_collector(t_shell *shell, int flag)
 {
-	ft_lstclear(garbage, free);
+	ft_lstclear(shell->garbage, free);
 	free_shell(shell);
+	if (flag)
+	{
+		if (shell->env)
+			free_mat(shell->env);
+	}
 }

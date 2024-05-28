@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: lbarlett <lbarlett@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/18 12:02:56 by espinell          #+#    #+#             */
-/*   Updated: 2024/05/06 13:30:57 by marvin           ###   ########.fr       */
+/*   Created: 2024/05/15 11:33:56 by mdella-r          #+#    #+#             */
+/*   Updated: 2024/05/23 11:47:11 by lbarlett         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,17 +56,19 @@ char	**get_env(char **envp)
 	return (NULL);
 }
 
-char	*ft_readline(char *str, t_garbage *garbage, t_shell *shell)
+char	*ft_readline(char *str, t_shell *shell)
 {
 	char	*line;
 
+	signal(SIGINT, ctrl_c);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTERM, ctrl_d);
 	line = readline(str);
-	ft_lstadd_back(&garbage, ft_lstnew(line));
+	rl_redisplay();
 	if (!line)
 	{
 		printf("exit\n");
-		garbage_collector(&garbage, shell);
-		ft_exit(0);
+		ft_quit(shell, 5, 1);
 	}
 	return (line);
 }
