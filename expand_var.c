@@ -71,7 +71,7 @@ void	expand_var(char **cmd, t_shell *shell)
 	while (cmd[id.i])
 	{
 		id.j = 0;
-		while (cmd[id.i][id.j])
+		while (cmd[id.i][id.j] && cmd[id.i][id.j] != ' ')
 		{
 			if (cmd[id.i][id.j] == '$')
 			{
